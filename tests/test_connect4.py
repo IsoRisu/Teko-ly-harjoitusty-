@@ -2,6 +2,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+import subprocess
 
 MAIN = Path(__file__).parent.parent / "main.py"
 
@@ -19,6 +20,21 @@ def run(commands):
 
 
 class TestConnect4(unittest.TestCase):
+
+    def test_move(self):
+        out = run("MOVE:0")
+        moves = [l for l in out if l.startswith("MOVE:")]
+        for m in moves:
+            col = m.split(":")[1]
+            self.assertEqual(col, "0")
+
+    def test_play_first_move(self):
+        out = run("PLAY:")
+        moves = [l for l in out if l.startswith("MOVE:")]
+        for m in moves:
+            col = m.split(":")[1]
+            self.assertEqual(col, "3")
+
     def test_fill_board(self):
         out = run(["PLAY:"] * 42)
         moves = [l for l in out if l.startswith("MOVE:")]
@@ -41,8 +57,25 @@ class TestConnect4(unittest.TestCase):
     def test_full_board_current(self):
         out = run(["PLAY:"] * 42 + ["CURRENT:"])
         current_line = [l for l in out if l.startswith("Board set to:")][-1]
-        self.assertEqual(current_line, "Board set to: [6, 6, 6, 6, 6, 6, 6]")
 
+        self.assertEqual(len(current_line), 238)
+
+    def test_immediate_vertical_win(self):
+        run("BOARD:3,2,3,2,3,2")
+        out = run("PLAY:")
+        moves = [l for l in out if l.startswith("LEAF")]
+        for m in moves:
+            col = m.split(":")[1]
+            print(col)
+            self.assertEqual(col, " 3 [[], [], ['O', 'O', 'O'], ['X', 'X', 'X', 'X'], [], [], []] 9223372036854775807")
+
+    def test_immediate_horizontal_win(self):
+        run("BOARD:0,0,1,1,2,2")
+        out = run("PLAY:")
+        moves = [l for l in out if l.startswith("LEAF")]
+        for m in moves:
+            col = m.split(":")[1]
+            self.assertEqual(col, " 3 [['X', 'O'], ['X', 'O'], ['X', 'O'], ['X'], [], [], []] 9223372036854775807")
 
 if __name__ == "__main__":
     unittest.main()

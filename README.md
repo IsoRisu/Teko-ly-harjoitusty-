@@ -1,5 +1,9 @@
 # Teko-ly-harjoitusty-
 
+HUOM:
+
+Olen rikkonut toiminnan kurssin tekoälyalustan kanssa, niin peliä pitää pelata terminaalissa.
+
 Projektin alustaminen:
 
 Lataa kurssin pelitekoälyalusta.
