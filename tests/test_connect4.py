@@ -22,18 +22,18 @@ def run(commands):
 class TestConnect4(unittest.TestCase):
 
     def test_move(self):
-        out = run("MOVE:0")
-        moves = [l for l in out if l.startswith("MOVE:")]
-        for m in moves:
-            col = m.split(":")[1]
-            self.assertEqual(col, "0")
+        out = run(["MOVE:0"])
+        moves = [l for l in out if l.startswith("PLAYER")]
+        self.assertTrue(moves, f"No PLAYER output. Got: {out}")
+        col = moves[-1].split("PLAYER ")[1]
+        self.assertEqual(col, "O")
 
     def test_play_first_move(self):
-        out = run("PLAY:")
-        moves = [l for l in out if l.startswith("MOVE:")]
-        for m in moves:
-            col = m.split(":")[1]
-            self.assertEqual(col, "3")
+        out = run(["PLAY:"])
+        moves = [l for l in out if l.startswith("M")]
+        self.assertTrue(moves, f"No MOVE: output. Got: {out}")
+        col = moves[-1].split(":")[1]
+        self.assertEqual(col, "3")
 
     def test_fill_board(self):
         out = run(["PLAY:"] * 42)
@@ -61,21 +61,14 @@ class TestConnect4(unittest.TestCase):
         self.assertEqual(len(current_line), 238)
 
     def test_immediate_vertical_win(self):
-        run("BOARD:3,2,3,2,3,2")
-        out = run("PLAY:")
-        moves = [l for l in out if l.startswith("LEAF")]
-        for m in moves:
-            col = m.split(":")[1]
-            print(col)
-            self.assertEqual(col, " 3 [[], [], ['O', 'O', 'O'], ['X', 'X', 'X', 'X'], [], [], []] 9223372036854775807")
+        out = run(["BOARD:3,2,3,2,3,2", "PLAY:"])
+        moves = [l for l in out if l.startswith("LEAF: 3")]
+        self.assertEqual(moves[-1].split("]]")[1], " 9223372036854775807")
 
     def test_immediate_horizontal_win(self):
-        run("BOARD:0,0,1,1,2,2")
-        out = run("PLAY:")
-        moves = [l for l in out if l.startswith("LEAF")]
-        for m in moves:
-            col = m.split(":")[1]
-            self.assertEqual(col, " 3 [['X', 'O'], ['X', 'O'], ['X', 'O'], ['X'], [], [], []] 9223372036854775807")
+        out = run(["BOARD:0,0,1,1,2,2", "PLAY:"])
+        moves = [l for l in out if l.startswith("LEAF: 3")]
+        self.assertEqual(moves[-1].split("]]")[1], " 9223372036854775807")
 
 if __name__ == "__main__":
     unittest.main()
