@@ -1,9 +1,5 @@
 # Teko-ly-harjoitusty-
 
-HUOM:
-
-Olen rikkonut toiminnan kurssin tekoälyalustan kanssa, niin peliä pitää pelata terminaalissa.
-
 Projektin alustaminen:
 
 Lataa kurssin pelitekoälyalusta.
@@ -23,3 +19,5 @@ Avaa terminaalissa projektikansio:
 Varmista että poetry on alustettuna ja riippuvuudet ajan tasalla.
 
 Sitten voit ajaa: poetry run python -m unittest tests.test_connect4 -v
+
+Peliä voi myös pelata terminaalissa. Komennot on samoja kuin esimerkkiprojektissa, ja lisäämäni CURRENT: komenta tulostaa laudan.
