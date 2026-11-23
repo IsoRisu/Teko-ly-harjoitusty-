@@ -3,6 +3,7 @@ import sys
 import unittest
 from pathlib import Path
 import subprocess
+import function_test
 
 MAIN = Path(__file__).parent.parent / "main.py"
 
@@ -62,13 +63,23 @@ class TestConnect4(unittest.TestCase):
 
     def test_immediate_vertical_win(self):
         out = run(["BOARD:3,2,3,2,3,2", "PLAY:"])
-        moves = [l for l in out if l.startswith("LEAF: 3")]
-        self.assertEqual(moves[-1].split("]]")[1], " 9223372036854775807")
+        moves = [l for l in out if l.startswith("MOVE:")]
+        self.assertEqual(moves[-1], "MOVE:3")
 
     def test_immediate_horizontal_win(self):
         out = run(["BOARD:0,0,1,1,2,2", "PLAY:"])
-        moves = [l for l in out if l.startswith("LEAF: 3")]
-        self.assertEqual(moves[-1].split("]]")[1], " 9223372036854775807")
+        moves = [l for l in out if l.startswith("MOVE:")]
+        self.assertEqual(moves[-1], "MOVE:3")
+
+    def test_minimax(self):
+        out = run(["PLAY:"] * 42)
+        moves = [l for l in out if l.startswith("MOVE:")]
+        moves = list(map(int,[int(l.split(":")[1]) for l in moves]))
+        smallest = min(moves)
+        biggest = max(moves)
+        self.assertGreaterEqual(smallest, 0) # checks that a moves are given within legal bounds
+        self.assertLess(biggest, 7) # checks that a moves are given within legal bounds
 
 if __name__ == "__main__":
+    function_test.main_func()
     unittest.main()

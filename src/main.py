@@ -1,6 +1,5 @@
 import copy
 import sys
-import random
 
 PLY = 9 # depth
 TIME = 2
@@ -13,8 +12,9 @@ def state_key(state): # creates a string and pics the lexicographically smaller 
 
 def bestmove(state, player, available):
     cache.clear() # cache depends on search
+    print(node_cache)
     node_cache.clear() # kind of a lazy solution but i don want to mess with the existing minimax
-    move, score = iterative_deepening(state, player, available) # Iterative deepening will call minimax 
+    move, score, depth = iterative_deepening(state, player, available) # Iterative deepening will call minimax 
     return move # We return the chosen move
     
 
@@ -85,7 +85,6 @@ def minimax(state, ply, player, available, original_col = None, last_col = None,
     return best_move, best_score
 
 def heuristic(state: list, player:bool, last_move:tuple = None): # Last move is given as the column
-    # NOTE (see BUGFIX 1): "player" here is the player who just made last_move (True = X), minimax passes "not player"
     # print(state) # Another useful debug print
     if state == [[],[],[],["X"],[],[],[]]: # Hardcoded value to play the first move in the middle as it is the best move
         return sys.maxsize
@@ -248,10 +247,14 @@ def iterative_deepening(state, player, available):
     global deadline, nodes
     deadline = time.time() + TIME
     nodes = 0
+    best_depth = 0
  
     best = next(c for c, i in enumerate(available) if i > 0) # Something playable in case even depth 1 would not finish
     score = 0
     for depth in range(1, sum(available) + 1): # No deeper than the amount of empty cells
+        if depth > best_depth:
+            best_depth = depth
+
         if time.time() > deadline:
             break
         try:
@@ -267,7 +270,7 @@ def iterative_deepening(state, player, available):
         best, score = move, depth_score
         if won or lost:
             break # A sure win or loss, searching deeper cannot change it
-    return best, score
+    return best, score , best_depth # best depth is for the time complexity benchmark
 
 if __name__ == "__main__":
     state = [[] for _ in range(7)] # Board
